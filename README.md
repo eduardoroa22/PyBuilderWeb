@@ -50,7 +50,7 @@
 
 ```powershell
 # 1. Clone the repository
-git clone https://github.com/your-username/PyBuilderWeb.git
+git clone https://github.com/eduardoroa22/PyBuilderWeb.git
 cd PyBuilderWeb
 
 # 2. Create a virtual environment
