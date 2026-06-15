@@ -23,7 +23,7 @@
 
 ## ✨ Features
 
-| Feature | Description | new
+| Feature | Description | new | 
 |---|---|
 | 🖼 **WYSIWYG Canvas** | Every component is rendered as a live wireframe block that mirrors the final HTML output |
 | 🗂 **Hierarchical Pages** | Organise pages in a tree — `category/subcategory/…` — and they export as nested folders |
