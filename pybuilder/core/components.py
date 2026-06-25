@@ -267,10 +267,10 @@ class CardGrid(Node):
         for line in self.props["cards"].splitlines():
             if not line.strip():
                 continue
-            parts = [p.strip() for p in line.split("|")]
-            while len(parts) < 3:
-                parts.append("")
-            out.append((parts[0], parts[1], parts[2]))
+            parts = [p.strip() for p in line.split("|", 2)]
+            parts += [""] * (3 - len(parts))
+            title, description, icon = parts
+            out.append((title, description, icon))
         return out
 
     def render_html(self) -> str:
@@ -365,5 +365,7 @@ COMPONENT_REGISTRY: dict[str, type[Node]] = {
 
 def create_component(type_name: str, props: dict[str, Any] | None = None,
                      node_id: str | None = None) -> Node:
-    cls = COMPONENT_REGISTRY[type_name]
+    cls = COMPONENT_REGISTRY.get(type_name)
+    if cls is None:
+        raise ValueError(f"Unknown component type: {type_name!r}")
     return cls(props=props, node_id=node_id)
