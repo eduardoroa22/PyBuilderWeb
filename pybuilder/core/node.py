@@ -11,6 +11,9 @@ import html
 import uuid
 from typing import Any, ClassVar
 
+Props = dict[str, Any]
+SchemaField = dict[str, Any]
+
 
 def escape(text: str | None) -> str:
     """Escape text for HTML, preserving line breaks as <br>."""
@@ -32,18 +35,48 @@ class Node:
     type_name: ClassVar[str] = "node"
     label: ClassVar[str] = "Node"
     icon: ClassVar[str] = "▭"
-    schema: ClassVar[list[dict[str, Any]]] = []
-    default_props: ClassVar[dict[str, Any]] = {}
+    schema: ClassVar[list[SchemaField]] = []
+    default_props: ClassVar[Props] = {}
 
-    def __init__(self, props: dict[str, Any] | None = None, node_id: str | None = None):
+    def __init__(self, props: Props | None = None, node_id: str | None = None):
         self.id = node_id or f"n_{uuid.uuid4().hex[:8]}"
         self.props = self._build_props(props)
 
-    def _build_props(self, props: dict[str, Any] | None) -> dict[str, Any]:
+    def _build_props(self, props: Props | None) -> Props:
         values = copy.deepcopy(self.default_props)
         if props:
             values.update(props)
         return values
+
+    @staticmethod
+    def generate_id(prefix: str = "n") -> str:
+        return f"{prefix}_{uuid.uuid4().hex[:8]}"
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> "Node":
+        return cls(props=data.get("props"), node_id=data.get("id"))
+
+    def duplicate(self, node_id: str | None = None,
+                  overrides: Props | None = None) -> "Node":
+        props = dict(self.props)
+        if overrides:
+            props.update(overrides)
+        return self.__class__(props=props, node_id=node_id)
+
+    def update_props(self, props: Props) -> None:
+        self.props.update(props)
+
+    def reset_props(self) -> None:
+        self.props = self._build_props(None)
+
+    def __getitem__(self, key: str) -> Any:
+        return self.props[key]
+
+    def __setitem__(self, key: str, value: Any) -> None:
+        self.props[key] = value
+
+    def __contains__(self, key: str) -> bool:
+        return key in self.props
 
     # ---- API that each component may override ---------------------------
     def render_html(self) -> str:
